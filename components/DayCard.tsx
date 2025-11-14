@@ -1,7 +1,6 @@
 
-import React, { useState, useCallback } from 'react';
-import { generateLearningContent } from '../services/geminiService';
-import { ChevronDownIcon, LoadingSpinner } from './icons';
+import React, { useState } from 'react';
+import { ChevronDownIcon } from './icons';
 import { MarkdownRenderer } from './MarkdownRenderer';
 
 interface DayCardProps {
@@ -9,33 +8,15 @@ interface DayCardProps {
   title: string;
   topic: string;
   Icon: React.ComponentType<{ className?: string }>;
+  content: string;
 }
 
-export const DayCard: React.FC<DayCardProps> = ({ day, title, topic, Icon }) => {
+export const DayCard: React.FC<DayCardProps> = ({ day, title, topic, Icon, content }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [content, setContent] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
-  const handleToggle = useCallback(async () => {
-    // Immediately toggle expansion state
+  const handleToggle = () => {
     setIsExpanded(prev => !prev);
-
-    // Fetch content only if it's the first time opening and content is not already loaded
-    if (!isExpanded && !content && !isLoading) {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const generatedContent = await generateLearningContent(topic);
-        setContent(generatedContent);
-      } catch (err) {
-        setError('Failed to generate content. Please try again.');
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  }, [isExpanded, content, isLoading, topic]);
+  };
 
   return (
     <div className="border border-gray-700/50 rounded-lg shadow-md bg-gray-800/50 backdrop-blur-sm overflow-hidden transition-all duration-300 ease-in-out">
@@ -61,14 +42,7 @@ export const DayCard: React.FC<DayCardProps> = ({ day, title, topic, Icon }) => 
       {isExpanded && (
         <div className="p-5 pt-0">
           <div className="border-t border-gray-700 pt-5">
-            {isLoading && (
-              <div className="flex items-center justify-center space-x-3 text-gray-400">
-                <LoadingSpinner className="w-6 h-6" />
-                <span>Generating your lesson plan...</span>
-              </div>
-            )}
-            {error && <p className="text-red-400 text-center">{error}</p>}
-            {content && <MarkdownRenderer content={content} />}
+            <MarkdownRenderer content={content} />
           </div>
         </div>
       )}
