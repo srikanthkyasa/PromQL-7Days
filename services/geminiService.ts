@@ -1,2 +1,0 @@
-
-// This service is no longer used as the lesson content is now static.
